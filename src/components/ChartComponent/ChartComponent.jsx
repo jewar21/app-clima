@@ -32,7 +32,7 @@ const ChartComponent = React.memo(({ forecastData }) => {
         let maxDate = item.temp_max;
         let minDate = item.temp_min;
         const descrip = item.descrip;
-        const dateArr = forecastData.filter(el => el.fecha === fecha);
+        const dateArr = forecastData.filter((el) => el.fecha === fecha);
 
         for (let j = 0; j < dateArr.length; j++) {
           const el = dateArr[j];
@@ -100,14 +100,14 @@ const ChartComponent = React.memo(({ forecastData }) => {
       <Line data={data} options={options} />
       <button onClick={openModal}>Modal</button>
       <Modal isOpen={isOpenModal} closeModal={closeModal}>
-        {getData.map((data) => {
+        {getData.map((data, index) => {
           return (
-            <>
+            <div key={index}>
               <p>{data.fecha}</p>
               <span>Más alta temperatura: {data.temp_max} &deg;C</span>
               <span>Más baja temperatura: {data.temp_min} &deg;C</span>
               <span>Descripción: {data.descrip}</span>
-            </>
+            </div>
           );
         })}
       </Modal>

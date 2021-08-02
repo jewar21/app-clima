@@ -3,11 +3,11 @@ import React, { useState } from "react";
 // import styles from "./Content.module.css";
 
 import styled from "styled-components";
+const WeatherIcon = styled.div`
+  color: whitesmoke;
+`;
 
 const Content = ({ weatherData }) => {
-  const WeatherIcon = styled.div`
-    color: whitesmoke;
-  `;
   const range = weatherData.weather[0].id;
   const icon = weatherData.weather[0].icon;
   const Icono = `${process.env.REACT_APP_ICON_URL}/${icon}@2x.png`;

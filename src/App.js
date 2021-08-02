@@ -7,7 +7,17 @@ import Header from "./components/Header";
 import Page from "./components/Page";
 
 import Select from "react-select";
+import TagManager from "react-gtm-module";
 
+const tagManagerArgs = {
+  gtmId: "GTM-PFBR3FF"
+};
+
+const dataTag = [];
+TagManager.initialize(tagManagerArgs);
+TagManager.dataLayer({
+  dataLayer: dataTag
+});
 const formInitial = {
   city: "",
   codPostal: ""
@@ -47,6 +57,11 @@ const App = () => {
       setData(body);
       peticionForest(body.name);
       peticionFind(body.coord.lat, body.coord.lon);
+      dataTag.push({
+        event: "temperatura_actual",
+        ciudad: body.name,
+        temperatura: body.main.temp
+      });
     }
     setError("Error de locación");
   };
@@ -85,6 +100,11 @@ const App = () => {
       // console.log("---> Name: ", body.name);
       if (value === "buscador") {
         peticionFind(body.coord.lat, body.coord.lon);
+        dataTag.push({
+          event: "busqueda_ciudad",
+          ciudad: body.name,
+          temperatura: body.main.temp
+        });
       }
     }
     setError("Error, ciudad no encontrada");
@@ -100,6 +120,11 @@ const App = () => {
       setData(body);
       peticionForest(body.name);
       peticionFind(body.coord.lat, body.coord.lon);
+      dataTag.push({
+        event: "busqueda_ciudad",
+        ciudad: body.name,
+        temperatura: body.main.temp
+      });
     }
     setError("Error, Código postal no encontrado");
   };
