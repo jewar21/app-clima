@@ -52,8 +52,6 @@ const ChartComponent = React.memo(({ forecastData }) => {
       }
     }
 
-    // console.log("getData", getData);
-
     if (getData.length > 5) {
       getData = getData.slice(0, 5);
     }

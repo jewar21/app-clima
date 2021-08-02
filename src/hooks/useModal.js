@@ -5,6 +5,7 @@ export const useModal = (initialValue = false) => {
 
   const openModal = () => setisOpen(true);
   const closeModal = () => setisOpen(false);
+  const handleStateChange = (newState) => setisOpen(newState);
 
-  return [isOpen, openModal, closeModal];
+  return [isOpen, openModal, closeModal, handleStateChange];
 };

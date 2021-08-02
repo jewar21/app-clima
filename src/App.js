@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import fetchP from "./helpers/fetch";
 import { useForm } from "./hooks/useForm";
+import { useModal } from "./hooks/useModal";
 
 import Header from "./components/Header";
 import Page from "./components/Page";
+import Error from "./components/Error";
 
 import Select from "react-select";
 import TagManager from "react-gtm-module";
@@ -27,7 +29,9 @@ const App = () => {
   const [data, setData] = useState([]);
   // const [find, setFind] = useState([]);
   const [option, setOption] = useState([]);
-  const [formValues, handleInputChange] = useForm(formInitial);
+  const [formValues, handleInputChange, reset] = useForm(formInitial);
+  const [isOpenModal, openModal, closeModal, handleStateChange] =
+    useModal(true);
   const [forecast, setForecast] = useState([]);
   const [cityOn, setCityOn] = useState(true);
   const [index, setIndex] = useState(0);
@@ -52,7 +56,6 @@ const App = () => {
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
 
-    // console.log("Location: ", body);
     if (body.cod === 200) {
       setData(body);
       peticionForest(body.name);
@@ -62,8 +65,10 @@ const App = () => {
         ciudad: body.name,
         temperatura: body.main.temp
       });
+      setloading(false);
+    } else if (body.cod === "400") {
+      setError("Error de locación");
     }
-    setError("Error de locación");
   };
 
   const peticionFind = async (lat, lon) => {
@@ -71,7 +76,6 @@ const App = () => {
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
 
-    // console.log("Location Select: ", body);
     if (body.cod === "200") {
       const localData = body.list;
       const cityOption = localData.map(function (item, index) {
@@ -81,23 +85,27 @@ const App = () => {
         return rObj;
       }, {});
       cityOption.shift();
-      // console.log("------>", cityOption);
       setOption(cityOption);
       peticionForest(body.list[index].name);
+      setloading(false);
+    } else if (body.cod === "400") {
+      setError(body.message);
+      handleStateChange(true);
+    } else if (body.cod === "404") {
+      setError(body.message);
+      handleStateChange(true);
     }
-    setError("Error de locación");
   };
 
   const peticionCity = async (value, city) => {
     const endPoint = `weather?q=${city}&units=metric&appid=${process.env.REACT_APP_API_KEY}&lang=es`;
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
-
-    // console.log("city: ", body);
+    setloading(false);
     if (body.cod === 200) {
       setData(body);
+      setloading(false);
       peticionForest(body.name);
-      // console.log("---> Name: ", body.name);
       if (value === "buscador") {
         peticionFind(body.coord.lat, body.coord.lon);
         dataTag.push({
@@ -106,18 +114,22 @@ const App = () => {
           temperatura: body.main.temp
         });
       }
+    } else if (body.cod === "400") {
+      setError(body.message);
+      handleStateChange(true);
+    } else if (body.cod === "404") {
+      setError(body.message);
+      handleStateChange(true);
     }
-    setError("Error, ciudad no encontrada");
   };
 
   const peticionCode = async (codPostal) => {
     const endPoint = `weather?zip=${codPostal},CO&units=metric&appid=${process.env.REACT_APP_API_KEY}&lang=es`;
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
-
-    // console.log("CodPostal: ", body);
     if (body.cod === 200) {
       setData(body);
+      setloading(false);
       peticionForest(body.name);
       peticionFind(body.coord.lat, body.coord.lon);
       dataTag.push({
@@ -125,12 +137,16 @@ const App = () => {
         ciudad: body.name,
         temperatura: body.main.temp
       });
+    } else if (body.cod === "400") {
+      setError(body.message);
+      handleStateChange(true);
+    } else if (body.cod === "404") {
+      setError(body.message);
+      handleStateChange(true);
     }
-    setError("Error, Código postal no encontrado");
   };
 
   const peticionForest = async (name) => {
-    // console.log("name", name);
     const endPoint = `forecast?q=${name}&units=metric&appid=${process.env.REACT_APP_API_KEY}&lang=es`;
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
@@ -148,33 +164,35 @@ const App = () => {
         const numDay = new Date(item.dt_txt).getDay();
         const nameDay = days[numDay];
         const rObj = {};
-        // rObj["fecha"] = item.dt_txt.split(/( )/)[0];
+
         rObj["fecha"] = nameDay;
         rObj["temp_max"] = item.main.temp_max;
         rObj["temp_min"] = item.main.temp_min;
         rObj["descrip"] = item.weather[0].description; //description
         return rObj;
       }, {});
-      // console.log("---bodyForest---", listData);
       setForecast(listData);
+    } else if (body.cod === "400") {
+      setError(body.message);
+      handleStateChange(true);
+    } else if (body.cod === "404") {
+      setError(body.message);
+      handleStateChange(true);
     }
-    setError("Error, pronóstico no establecido");
   };
 
   const handleCity = (e) => {
     e.preventDefault();
+    setloading(true)
     const value = "buscador";
-    // document.getElementById("form1").reset();
     peticionCity(value, city);
-    e.target.reset();
-    // Llamar peticionCity(city) saca lat y lon y llama peticionLatLon
+    reset(formInitial);
   };
 
   const handleCode = (e) => {
     e.preventDefault();
-    // console.log("codPostal", codPostal);
     peticionCode(codPostal);
-    // Llamar peticionCode(codePostal) saca lat y lon y llama peticionLatLon
+    reset(formInitial);
   };
 
   const onDropdownChange = (value) => {
@@ -212,8 +230,16 @@ const App = () => {
           <button type="submit">Buscar</button>
         </form>
       )}
+      {error !== null && (
+        <Error
+          error={error}
+          isOpen={isOpenModal}
+          closeModal={closeModal}
+          openModal={openModal}
+        />
+      )}
       <Select value={index} options={option} onChange={onDropdownChange} />
-      <Page data={data} forecast={forecast} loading={loading} error={error} />
+      <Page data={data} forecast={forecast} loading={loading} />
     </div>
   );
 };
