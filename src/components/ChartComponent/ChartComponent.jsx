@@ -54,7 +54,7 @@ const ChartComponent = React.memo(({ forecastData }) => {
       }
     }
 
-    console.log("getData", getData);
+    // console.log("getData", getData);
 
     if (getData.length > 5) {
       getData = getData.slice(0, 5);
@@ -100,8 +100,8 @@ const ChartComponent = React.memo(({ forecastData }) => {
   return (
     <div>
       <Line data={data} options={options} />
-      <button>Modal</button>
-      <Modal>
+      <button onClick={openModal}>Modal</button>
+      <Modal isOpen={isOpenModal} closeModal={closeModal}>
         {getData.map((data) => {
           return (
             <>

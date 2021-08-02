@@ -4,11 +4,11 @@ const fetchP = {}
 
 fetchP.fetchSinToken = (endPoint, data, method = 'GET') => {
 
-    console.log('endPoint',endPoint)
+    // console.log('endPoint',endPoint)
 
     const url = `${baseUrl}/${endPoint}`
 
-    console.log('-->', url)
+    // console.log('-->', url)
 
     if (method === 'GET') {
         return fetch(url)

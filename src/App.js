@@ -21,6 +21,8 @@ const App = () => {
   const [forecast, setForecast] = useState([]);
   const [cityOn, setCityOn] = useState(true);
   const [index, setIndex] = useState(0);
+  const [error, setError] = useState(null);
+  const [loading, setloading] = useState(false);
 
   const { city, codPostal } = formValues;
 
@@ -39,13 +41,13 @@ const App = () => {
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
 
-    console.log("Location: ", body);
+    // console.log("Location: ", body);
     if (body.cod === 200) {
       setData(body);
       peticionForest(body.name);
       peticionFind(body.coord.lat, body.coord.lon);
-      
     }
+    setError("Error de locación");
   };
 
   const peticionFind = async (lat, lon) => {
@@ -53,9 +55,9 @@ const App = () => {
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
 
-    console.log("Location Select: ", body);
-    const localData = body.list;
-    if (localData) {
+    // console.log("Location Select: ", body);
+    if (body.cod === "200") {
+      const localData = body.list;
       const cityOption = localData.map(function (item, index) {
         const rObj = {};
         rObj["value"] = index;
@@ -67,6 +69,7 @@ const App = () => {
       setOption(cityOption);
       peticionForest(body.list[index].name);
     }
+    setError("Error de locación");
   };
 
   const peticionCity = async (value, city) => {
@@ -75,12 +78,15 @@ const App = () => {
     const body = await resp.json();
 
     // console.log("city: ", body);
-    setData(body);
-    peticionForest(body.name);
-    // console.log("---> Name: ", body.name);
-    if (value === "buscador") {
-      peticionFind(body.coord.lat, body.coord.lon);
+    if (body.cod === 200) {
+      setData(body);
+      peticionForest(body.name);
+      // console.log("---> Name: ", body.name);
+      if (value === "buscador") {
+        peticionFind(body.coord.lat, body.coord.lon);
+      }
     }
+    setError("Error, ciudad no encontrada");
   };
 
   const peticionCode = async (codPostal) => {
@@ -88,14 +94,17 @@ const App = () => {
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
 
-    console.log("CodPostal: ", body);
-    setData(body);
-    peticionForest(body.name);
-    peticionFind(body.coord.lat, body.coord.lon);
+    // console.log("CodPostal: ", body);
+    if (body.cod === 200) {
+      setData(body);
+      peticionForest(body.name);
+      peticionFind(body.coord.lat, body.coord.lon);
+    }
+    setError("Error, Código postal no encontrado");
   };
 
   const peticionForest = async (name) => {
-    console.log("name", name);
+    // console.log("name", name);
     const endPoint = `forecast?q=${name}&units=metric&appid=${process.env.REACT_APP_API_KEY}&lang=es`;
     const resp = await fetchP.fetchSinToken(endPoint);
     const body = await resp.json();
@@ -117,19 +126,21 @@ const App = () => {
         rObj["fecha"] = nameDay;
         rObj["temp_max"] = item.main.temp_max;
         rObj["temp_min"] = item.main.temp_min;
-        rObj["descrip"] = item.weather[0].description //description
+        rObj["descrip"] = item.weather[0].description; //description
         return rObj;
       }, {});
-      console.log("---bodyForest---", listData);
+      // console.log("---bodyForest---", listData);
       setForecast(listData);
     }
+    setError("Error, pronóstico no establecido");
   };
 
   const handleCity = (e) => {
     e.preventDefault();
-    console.log("city", city);
     const value = "buscador";
+    // document.getElementById("form1").reset();
     peticionCity(value, city);
+    e.target.reset();
     // Llamar peticionCity(city) saca lat y lon y llama peticionLatLon
   };
 
@@ -155,7 +166,7 @@ const App = () => {
       <span>O</span>
       <button onClick={seeCode}>Código postal</button>
       {cityOn ? (
-        <form onSubmit={handleCity}>
+        <form onSubmit={handleCity} id="form1">
           <input
             value={city}
             name="city"
@@ -176,7 +187,7 @@ const App = () => {
         </form>
       )}
       <Select value={index} options={option} onChange={onDropdownChange} />
-      <Page data={data} forecast={forecast} />
+      <Page data={data} forecast={forecast} loading={loading} error={error} />
     </div>
   );
 };
