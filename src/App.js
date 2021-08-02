@@ -27,6 +27,7 @@ const App = () => {
   const { city, codPostal } = formValues;
 
   useEffect(() => {
+    setloading(true);
     localPosition();
   }, []);
 

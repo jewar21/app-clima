@@ -6,7 +6,7 @@ import Modal from "../Modal";
 import { useModal } from "../../hooks/useModal";
 
 const ChartComponent = React.memo(({ forecastData }) => {
-  const [isOpenModal, openModal, closeModal] = useModal(false)
+  const [isOpenModal, openModal, closeModal] = useModal(false);
   let temp1 = [];
   let temp2 = [];
   let fechaDay = [];
@@ -32,9 +32,7 @@ const ChartComponent = React.memo(({ forecastData }) => {
         let maxDate = item.temp_max;
         let minDate = item.temp_min;
         const descrip = item.descrip;
-        const dateArr = forecastData.filter(
-          (el) => el.fecha === fecha
-        );
+        const dateArr = forecastData.filter(el => el.fecha === fecha);
 
         for (let j = 0; j < dateArr.length; j++) {
           const el = dateArr[j];
