@@ -11,6 +11,11 @@ import Error from "./components/Error";
 import Select from "react-select";
 import TagManager from "react-gtm-module";
 
+import "./App.css";
+import coverImage from "./Assets/background.jpg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+
 const tagManagerArgs = {
   gtmId: "GTM-PFBR3FF"
 };
@@ -183,7 +188,7 @@ const App = () => {
 
   const handleCity = (e) => {
     e.preventDefault();
-    setloading(true)
+    setloading(true);
     const value = "buscador";
     peticionCity(value, city);
     reset(formInitial);
@@ -200,46 +205,77 @@ const App = () => {
     peticionCity(value.value, value.label);
   };
 
-  const seeCity = () => setCityOn(true);
-  const seeCode = () => setCityOn(false);
+  const onDropdownChangeSearch = (e) => {
+    const el = e.target.value;
+    if (el === "0") {
+      setCityOn(true);
+    } else if (el === "1") {
+      setCityOn(false);
+    }
+  };
 
   return (
-    <div>
+    <div className="container">
+      <div className="container-son">
+      <img className="img-responsive" src={coverImage} alt=""></img>
       <Header />
-      <button onClick={seeCity}>Ciudad</button>
-      <span>O</span>
-      <button onClick={seeCode}>Código postal</button>
-      {cityOn ? (
-        <form onSubmit={handleCity} id="form1">
-          <input
-            value={city}
-            name="city"
-            onChange={handleInputChange}
-            placeholder="Ciudad"
-          ></input>
-          <button type="submit">Buscar</button>
-        </form>
-      ) : (
-        <form onSubmit={handleCode}>
-          <input
-            value={codPostal}
-            name="codPostal"
-            onChange={handleInputChange}
-            placeholder="Cod Postal"
-          ></input>
-          <button type="submit">Buscar</button>
-        </form>
-      )}
-      {error !== null && (
-        <Error
-          error={error}
-          isOpen={isOpenModal}
-          closeModal={closeModal}
-          openModal={openModal}
+        <div className="search-container">
+          <select className="btn" onChange={onDropdownChangeSearch}>
+            <option value="default" selected>
+              Búsqueda por:
+            </option>
+            <option value="0">Ciudad</option>
+            <option value="1">Código</option>
+          </select>
+          {cityOn ? (
+            <form onSubmit={handleCity} id="form1">
+              <div className="search-box">
+                <input
+                  className="search-txt"
+                  value={city}
+                  name="city"
+                  onChange={handleInputChange}
+                  placeholder="Ciudad"
+                ></input>
+                <button className="search-btn" type="submit">
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleCode}>
+              <div className="search-box">
+                <input
+                  className="search-txt"
+                  value={codPostal}
+                  name="codPostal"
+                  onChange={handleInputChange}
+                  placeholder="Cod Postal"
+                ></input>
+                <button className="search-btn" type="submit">
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+        {error !== null && (
+          <Error
+            error={error}
+            isOpen={isOpenModal}
+            closeModal={closeModal}
+            openModal={openModal}
+          />
+        )}
+        <Select
+          className="select"
+          placeholder="Ciudades cercanas"
+          value={index}
+          options={option}
+          onChange={onDropdownChange}
         />
-      )}
-      <Select value={index} options={option} onChange={onDropdownChange} />
-      <Page data={data} forecast={forecast} loading={loading} />
+        <Page data={data} forecast={forecast} loading={loading} />
+      </div>
     </div>
   );
 };

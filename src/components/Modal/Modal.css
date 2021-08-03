@@ -23,11 +23,14 @@
   min-height: 200px;
   max-height: 600px;
   overflow-y: auto; /*Scroll*/
-  background-color: #fff;
+  background-color: rgba(194, 194, 194, 0.6);
 }
 
 .modal-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  background: none;
+  border: none;
+  top: 0.2rem;
+  right: 0.2rem;
+  font-size: 18px;
 }

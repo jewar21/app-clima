@@ -1,11 +1,15 @@
 import React from "react";
 
-import styles from "./Header.module.css";
+import "./Header.css";
 
-const Header = () => (
-  <h1 className={styles.heading}>
-    <span className={styles.light}>Aplicación del Clima</span>
-  </h1>
-);
+const Header = () => {
+  return (
+    <div className="container-header">
+      <h1 className="header">
+        <span>Aplicación del Clima</span>
+      </h1>
+    </div>
+  );
+};
 
 export default Header;

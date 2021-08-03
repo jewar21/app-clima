@@ -5,6 +5,14 @@ import moment from "moment";
 import Modal from "../Modal";
 import { useModal } from "../../hooks/useModal";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faInfoCircle,
+  faCaretUp,
+  faCaretDown
+} from "@fortawesome/free-solid-svg-icons";
+import "./Chart.css";
+
 const ChartComponent = React.memo(({ forecastData }) => {
   const [isOpenModal, openModal, closeModal] = useModal(false);
   let temp1 = [];
@@ -94,17 +102,32 @@ const ChartComponent = React.memo(({ forecastData }) => {
   };
 
   return (
-    <div>
-      <Line data={data} options={options} />
-      <button onClick={openModal}>Modal</button>
+    <div className="container-forecast">
+      <div className="forecast-son">
+        <h2>Pronóstico</h2>
+        <Line data={data} options={options} />
+      </div>
+      <button className="btn-modal" onClick={openModal}>
+        Días de la semana <FontAwesomeIcon icon={faInfoCircle} />
+      </button>
       <Modal isOpen={isOpenModal} closeModal={closeModal}>
         {getData.map((data, index) => {
           return (
-            <div key={index}>
-              <p>{data.fecha}</p>
-              <span>Más alta temperatura: {data.temp_max} &deg;C</span>
-              <span>Más baja temperatura: {data.temp_min} &deg;C</span>
-              <span>Descripción: {data.descrip}</span>
+            <div key={index} className="modal-content">
+              <div className="modal-fecha">
+                <p>{data.fecha}</p>
+              </div>
+              <div className="modal-temp">
+                <span>
+                  <FontAwesomeIcon icon={faCaretUp} /> {data.temp_max} &deg;C
+                </span>
+                <span>
+                  <FontAwesomeIcon icon={faCaretDown} /> {data.temp_min} &deg;C
+                </span>
+              </div>
+              <div className="modal-desc">
+                <span>{data.descrip}</span>
+              </div>
             </div>
           );
         })}
